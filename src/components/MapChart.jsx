@@ -11,7 +11,7 @@ class MapChart extends Component {
       parentElement: this.props.parentElement
     }
     this.geoData = this.props.geoData
-    this.data = this.props.data
+    this.data = Object.assign({}, this.props.data)
     this.formatTime = this.props.formatTime
   }
 
@@ -66,7 +66,7 @@ class MapChart extends Component {
 
   wrangleData () {
     const vis = this.vis
-    vis.data = Object.create(this.data) // copy object with no reference to avoid perturb the linechart who need data ordered by date asc
+    vis.data = this.data // copy object with no reference to avoid perturb the linechart who need data ordered by date asc
     vis.geoData = this.geoData
     // sort by date desc because we want recent data
     Object.values(vis.data).map(region => {
