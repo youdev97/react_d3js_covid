@@ -8,7 +8,7 @@ class LineChart extends Component {
     this.vis = {
       parentElement: this.props.parentElement,
       variable: this.props.variable,
-      title: this.props.title,
+      title: this.props.title
     }
     this.drawChart()
   }
@@ -78,7 +78,7 @@ class LineChart extends Component {
     this.wrangleData('Brussels')
   }
 
-  wrangleData(city) {
+  wrangleData (city) {
     const vis = this.vis
     console.log(this.props.data)
     // filter by region
@@ -91,15 +91,91 @@ class LineChart extends Component {
       .rollup(function (v) {
         return d3.sum(v, function (d) {
           return d[vis.variable]
-        });
+        })
       })
       .entries(vis.filteredData)
-    vis.g.select('text').text(city) //update title
-    vis.updateVis()
+    vis.g.select('text').text(city) // update title
+    this.updateVis()
+  }
+
+  updateVis () {
+    const vis = this.vis
+    vis.t = d3.transition().duration(1000)
+
+    // update scales
+    vis.x.domain(d3.extent(vis.filteredData, d => d.key))
+    vis.y.domain([
+      d3.min(vis.filteredData, d => d.value),
+      d3.max(vis.filteredData, d => d.value)
+    ])
+
+    // update axes
+    vis.xAxisCall.scale(vis.x)
+    vis.xAxis.transition(vis.t).call(vis.xAxisCall)
+    vis.yAxisCall.scale(vis.y)
+    vis.yAxis.transition(vis.t).call(vis.yAxisCall)
+
+    // clear old tooltips
+    vis.g.select('.focus').remove()
+    vis.g.select('.overlay').remove()
+
+    /** ******************************* Tooltip Code ********************************/
+
+    vis.focus = vis.g.append('g')
+      .attr('class', 'focus')
+      .style('display', 'none')
+
+    vis.focus.append('line')
+      .attr('class', 'x-hover-line hover-line')
+      .attr('y1', 0)
+      .attr('y2', vis.HEIGHT)
+
+    vis.focus.append('line')
+      .attr('class', 'y-hover-line hover-line')
+      .attr('x1', 0)
+      .attr('x2', vis.WIDTH)
+
+    vis.focus.append('circle')
+      .attr('r', 7.5)
+
+    vis.focus.append('text')
+      .attr('x', 15)
+      .attr('dy', '.31em')
+
+    vis.g.append('rect')
+      .attr('class', 'overlay')
+      .attr('width', vis.WIDTH)
+      .attr('height', vis.HEIGHT)
+      .on('mouseover', () => vis.focus.style('display', null))
+      .on('mouseout', () => vis.focus.style('display', 'none'))
+      .on('mousemove', mousemove)
+
+    function mousemove () {
+      // console.log(vis.filteredData)
+      const x0 = vis.x.invert(d3.mouse(this)[0])
+      const i = vis.bisectDate(vis.filteredData, x0, 1)
+      const d0 = vis.filteredData[i - 1]
+      const d1 = i === vis.filteredData.length ? vis.filteredData[i - 1] : vis.filteredData[i] // avoid error on last index
+      const d = x0 - d0.key > d1.key - x0 ? d1 : d0
+      vis.focus.attr('transform', `translate(${vis.x(d.key)}, ${vis.y(d.value)})`)
+      vis.focus.select('text').text(d.value)
+      vis.focus.select('.x-hover-line').attr('y2', vis.HEIGHT - vis.y(d.value))
+      vis.focus.select('.y-hover-line').attr('x2', -vis.x(d.key))
+    }
+
+    // Path generator
+    vis.line = d3.line()
+      .x(d => vis.x(d.key))
+      .y(d => vis.y(d.value))
+
+    // Update our line path
+    vis.g.select('.line')
+      .transition(vis.t)
+      .attr('d', vis.line(vis.filteredData))
   }
 
   render () {
-    return <div id={'#' + 'this.props.test'} />
+    return <div />
   }
 }
 
