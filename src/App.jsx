@@ -105,11 +105,9 @@ class App extends Component {
                 {lineChart2}
               </div>
             </div>
-            <div className='row'>
-              <div className='col-12'>
-                <div id='map'>
-                  {mapChart}
-                </div>
+            <div className='col-sm-12 col-md-12 col-xl-12'>
+              <div id='map'>
+                {mapChart}
               </div>
             </div>
           </div>
