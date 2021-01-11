@@ -5,13 +5,13 @@ import * as d3 from 'd3'
 import $ from 'jquery'
 
 class MapChart extends Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.vis = {
       parentElement: this.props.parentElement
     }
     this.geoData = this.props.geoData
-    this.data = Object.assign({}, this.props.data)
+    this.data = this.props.data
     this.formatTime = this.props.formatTime
   }
 
@@ -66,14 +66,20 @@ class MapChart extends Component {
 
   wrangleData () {
     const vis = this.vis
-    vis.data = this.data // copy object with no reference to avoid perturb the linechart who need data ordered by date asc
+    vis.data = JSON.parse(JSON.stringify(this.data)) // copy object with no reference to avoid perturb the linechart who need data ordered by date asc
     vis.geoData = this.geoData
+    console.log(vis.data)
     // sort by date desc because we want recent data
-    Object.values(vis.data).map(region => {
+    Object.values(vis.data).forEach(region => {
+      region.map(d => {
+        d.date = new Date(d.date)
+        return d
+      })
       region.sort(function (a, b) {
         return b.date - a.date
       })
     })
+    console.log(vis.data)
     // console.log(vis.data)
     this.updateVis()
   }
@@ -153,7 +159,7 @@ class MapChart extends Component {
 
   // sum the latest data of region's subunits('province')
   getLastRegionData (region) {
-    const vis = this
+    const vis = this.vis
     const lastReport = vis.data[region][0]
     let { total_in, new_in, new_out, total_in_resp, date } = lastReport
     let i = 1

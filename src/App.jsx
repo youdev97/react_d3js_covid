@@ -14,6 +14,8 @@ class App extends Component {
       data: null
     }
     this.geoData = null
+    this.LineChartElement = React.createRef()
+    this.LineChartElement2 = React.createRef()
   }
 
   parseTime = d3.timeParse('%Y-%m-%d')
@@ -54,7 +56,7 @@ class App extends Component {
       })
       d3.json('./data/belgium.json').then(function (values) {
         parent.geoData = values
-        console.log(formattedData)
+        //console.log(formattedData)
         parent.setState({
           data: formattedData
         })
@@ -64,13 +66,18 @@ class App extends Component {
     })
   }
 
+  handleClick(e, city) {
+    this.LineChartElement.current.changeCity(city)
+    this.LineChartElement2.current.changeCity(city)
+  }
+
   render() {
     let lineChart = null
     let lineChart2 = null
     let mapChart = null
     if (this.state.data) {
-      lineChart = <LineChart parentElement='#chart-area' variable='new_in' title='covid-19 new entries' data={this.state.data} />
-      lineChart2 = <LineChart parentElement='#chart-area2' variable='total_in' title='covid-19 patients' data={this.state.data} />
+      lineChart = <LineChart parentElement='#chart-area' ref={this.LineChartElement} variable='new_in' title='covid-19 new entries' data={this.state.data} />
+      lineChart2 = <LineChart parentElement='#chart-area2' ref={this.LineChartElement2} variable='total_in' title='covid-19 patients' data={this.state.data} />
     }
     if (this.state.data && this.geoData) {
       mapChart = <MapChart parentElement='#map' geoData={this.geoData} data={this.state.data} formatTime={this.formatTime} />
@@ -79,8 +86,8 @@ class App extends Component {
       <div className='App'>
         <nav className='navbar navbar-light bg-light'>
           <div className='container'>
-            <a className='navbar-brand'>
-              <img id='logo' src={logo} height='120' />
+            <a className='navbar-brand' href="/">
+              <img id='logo' src={logo} height='120' alt="logo that represents a virus" />
             </a>
           </div>
         </nav>
@@ -88,9 +95,9 @@ class App extends Component {
         <div className='container'>
           <div className='col-sm-12 col-md-12 col-xl-12'>
             <div className='buttons-container'>
-              <button type='button' data-index='Brussels' name='button' className='btn btn-secondary'>Brussels</button>
-              <button type='button' data-index='Flanders' name='button' className='btn btn-secondary'>Flanders</button>
-              <button type='button' data-index='Wallonia' name='button' className='btn btn-secondary'>Wallonia</button>
+              <button type='button' key='Flanders' onClick={(e) => this.handleClick(e, 'Flanders')} name='button' className='btn btn-secondary'>Flanders</button>
+              <button type='button' key='Wallonia' onClick={(e) => this.handleClick(e, 'Wallonia')} name='button' className='btn btn-secondary'>Wallonia</button>
+              <button type='button' key='Brussels' onClick={(e) => this.handleClick(e, 'Brussels')} name='button' className='btn btn-secondary'>Brussels</button>
             </div>
           </div>
           <div className='row'>

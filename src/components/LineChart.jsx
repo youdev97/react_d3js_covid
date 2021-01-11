@@ -4,12 +4,22 @@ import React, {
 import * as d3 from 'd3'
 
 class LineChart extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      city: 'Brussels'
+    }
+  }
+
   componentDidMount () {
     this.vis = {
       parentElement: this.props.parentElement,
       variable: this.props.variable,
-      title: this.props.title
+      title: this.props.title,
+      filteredData: null
     }
+    this.data = this.props.data
     this.drawChart()
   }
 
@@ -75,14 +85,14 @@ class LineChart extends Component {
     vis.yAxis = vis.g.append('g')
       .attr('class', 'y axis')
 
-    this.wrangleData('Brussels')
+    this.wrangleData(this.state.city)
   }
 
   wrangleData (city) {
     const vis = this.vis
-    console.log(this.props.data)
+    vis.data = JSON.parse(JSON.stringify(this.data));
     // filter by region
-    vis.filteredData = [...this.props.data[city]]
+    vis.filteredData = vis.data[city]
     // if region have subunits sum the data for the same date
     vis.filteredData = d3.nest()
       .key(function (d) {
@@ -172,6 +182,16 @@ class LineChart extends Component {
     vis.g.select('.line')
       .transition(vis.t)
       .attr('d', vis.line(vis.filteredData))
+  }
+
+  changeCity = (city) => {
+    this.setState({
+      city: city
+    })
+  }
+
+  componentDidUpdate() {
+    this.wrangleData(this.state.city)
   }
 
   render () {
