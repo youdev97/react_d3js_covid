@@ -1,4 +1,7 @@
-# Getting Started with Create React App
+# D3.js v5 & Belgium's covid-19 data
+
+After [my first personnal project on D3.js(v5)](https://gitlab.com/youdev97/d3js_covid) which was only an index.html and a .js file,
+to improve my skills in JS I decided to implement it in a ReactJS app
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
