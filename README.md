@@ -4,6 +4,8 @@ DataViz with D3.js v5 LineCharts & MapChart that displays last updated data abou
 
 Based on [my first personnal project on D3.js(v5)](https://gitlab.com/youdev97/d3js_covid) and to improve my skills in JS I decided to combine it with ReactJS
 
+![plot](./src/img/demo.png)
+
 ## LineChart
 
 I built a LineChart class that is used 2 times to create a graph about the number of hospital's intakes in Belgium and an another one with the total number of patients for the last few months.
